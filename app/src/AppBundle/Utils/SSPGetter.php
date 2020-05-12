@@ -178,6 +178,9 @@ class SSPGetter
                         $result[$idp->getEntityId($this->samlidp_hostname)]['OrganizationURL'][$orgElem->getLang()] = $orgElem->getValue();
                     }
                 }
+                if (!$result[$idp->getEntityId($this->samlidp_hostname)]['OrganizationURL'][$orgElem->getLang()]){
+                    $result[$idp->getEntityId($this->samlidp_hostname)]['OrganizationURL'][$orgElem->getLang()] = $idp->getInstituteUrl();
+                }
 
                 # authproc dynamic parts
                 $result[$idp->getEntityId($this->samlidp_hostname)]['authproc'][16] = array(
