@@ -6,6 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile    
     image: samli/nren
+    # privileged: true // Only used this for some debugging.
     ports:
       - "80:80"
       - "443:443"
@@ -16,31 +17,47 @@ services:
     depends_on:
       - 'db'
     environment:
-      - "SAMLIDP_HOSTNAME=example.eduid.africa"
+      - "SAMLIDP_HOSTNAME=localhost"
       - "VAULT_PASS=secret"
-      - "DATABASE_HOST=db.example.net"
+      - "DATABASE_HOST=db"
       - "DATABASE_PORT=5432" 
       - "DATABASE_DRIVER=pdo_pgsql"
       - "DATABASE_VERSION=10"
       - "DATABASE_NAME=symfony" 
       - "DATABASE_USER=symfony" 
       - "DATABASE_PASSWORD=secret"
-      - "MAILER_HOST=127.0.0.1" 
-      - "MAILER_PORT=25"
+      - "MAILER_HOST=smtp.gmail.com" 
+      - "MAILER_PORT=465"
       - "MAILER_ENCRYPTION=ssl"
-      - "MAILER_USER=user" 
-      - "MAILER_PASSWORD=password"
-      - "MAILER_SENDER=noreply@example.org"
+      - "MAILER_USER=you@gmail.com" 
+      - "MAILER_PASSWORD=YourCreatedPasswordForYourGoogleApp"
+      - "MAILER_SENDER=you@gmail.com"
       - "ROLLBAR_ACCESS_TOKEN=fake" 
       - "LOGGLY_AUTH_TOKEN=fake" 
       - "LOGGLY_TAG=samli-ssp" 
       - "REMOTE_LOGSERVER_AND_PORT=host_or_ip:port" 
+      - "SAMLIDP_RUNNING_MODE=frontend"
     logging:
       driver: "json-file"
       #driver: "fluentd"
       #options:
       #  fluentd-address: 129.232.230.131:24224
       #  tag: eduid.africa
+  db:
+    image: postgres:9.6
+    container_name: postgres
+    restart: unless-stopped
+    ports:
+      - 5432:5432
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    logging:
+      driver: "json-file"
+    environment:
+      - "POSTGRES_USER=symfony"
+      - "POSTGRES_PASSWORD=secret"
+      - "POSTGRES_DB=symfony"
 
 volumes:
   storage-data:
+  db-data:

@@ -5,6 +5,9 @@
 !var/logs/.gitkeep
 !var/sessions/.gitkeep
 
+# In case you copy app/src to root directory
+/src
+
 # Parameters
 /app/config/parameters.yml
 /app/config/parameters.ini

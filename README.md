@@ -22,15 +22,15 @@ Using this service is free, but donations are welcome and will go towards furthe
 ## Installation
 
 1. Clone this repository
-1. Grab your wildcard certificate from your CA, use `wildcard_certificate.key/wildcard_certificate.crt` names for them.
-1. Encrypt the key: `openssl aes256 -md sha256 -a -salt -k $VAULT_PASS -in wildcard_certificate.key -out wildcard_certificate.key.enc`
-then put the certificate and the encrypted key into `conf/credentials` folder. You will need this `$VAULT_PASS` for starting the app, so save it. Depending your CA but you may have to merge the certificatechain into `wildcard_certificate.crt`.
+1. Grab your wildcard certificate from your CA, use `wildcard_certificate.key/wildcard_certificate.crt` names for them. For local development on OSX, you can get both the self-signed .key and .crt by running this command `openssl req -newkey rsa:2048 -nodes -keyout wildcard_certificate.key -x509 -days 365 -out wildcard_certificate.crt`. You can set -dyas to be more than 365. 
+1. Encrypt the key: `openssl aes256 -md sha256 -a -salt -k $VAULT_PASS -in wildcard_certificate.key -out wildcard_certificate.key.enc`. In OSX, you can do this `openssl aes-256-cbc -md sha256 -a -salt -k <$VAULT_PASS> -in wildcard_certificate.key -out wildcard_certificate.key.enc`. Remember to replace `<$VAULT_PASS>` with the value of `$VAULT_PASS` in your docker compose file.
+Then put the certificate and the encrypted key into `conf/credentials` folder. You will need this `$VAULT_PASS` for starting the app, so save it. Depending your CA but you may have to merge the certificatechain into `wildcard_certificate.crt`.
 1. Configure storage service in `app/app/config/config.yml` and logging service in `app/app/config/config_prod.yml`. There are lots of [Monolog handlers](https://github.com/Seldaek/monolog/tree/master/src/Monolog/Handler) you can use directly.
 1. Generate a self-signed certificate for the attribute release checking service, which will be deployed to `attributes.$SAMLIDP_HOSTNAME`. `cd conf/credentials && openssl req -new -newkey rsa:2048 -x509 -days 3652 -nodes -out attributes.$SAMLIDP_HOSTNAME.crt -keyout attributes.$SAMLIDP_HOSTNAME.key`. Important: value of `CN` must be `$SAMLIDP_HOSTNAME`. In case the attribute release checking service page fails to open and you get an error `Unable to load private key from file "/app/vendor/simplesamlphp/simplesamlphp/cert/attributes.$SAMLIDP_HOSTNAME` make sure the key file has appropriate read permissions and build the image again.
 1. Build the image: `docker build -t samli/nren .`
 1. Edit `docker-compose.yml`, fill the values environment variables. (See details below)
 1. Start the service: `docker-compose up`
-1. Connect to your samlidp service on your choosen domain via your browser
+1. Connect to your samlidp service on your choosen domain via your browser. If you used the self-signed certificates (for localhost), you may need to hit this url `chrome://flags/#allow-insecure-localhost` in your chrome browser to allow your app run on chrome.
 1. Register an `admin` user, then run in the container: `app/bin/console fos:user:promote admin ROLE_SUPER_ADMIN`. After logout and login this user can be able to edit all the registered IdPs and users.
 1. Test the app, register an IdP, add users, test against an SP...etc
 
@@ -54,9 +54,9 @@ then put the certificate and the encrypted key into `conf/credentials` folder. Y
 | `DATABASE_NAME` | The database database name. **Required** |
 | `DATABASE_USER` | The database database user. **Required** |
 | `DATABASE_PASSWORD` | The database database password.  **Required** |
-| `MAILER_HOST` | SMTP server host **Required**|
-| `MAILER_PORT` | SMTP server port **Required**|
-| `ENCRYPTION` | SMTP encryption (tls, ssl) **Required**|
+| `MAILER_HOST` | SMTP server host. To configure email for localhost, just create a gmail App Password. **Required**|
+| `MAILER_PORT` | SMTP server port. Use the defualt in docker-compose.example for localhost. **Required**|
+| `MAILER_ENCRYPTION` | SMTP encryption (tls, ssl). Use the defualt in docker-compose.example for localhost. **Required**|
 | `MAILER_USER` | SMTP username **Required**|
 | `MAILER_PASSWORD` | SMTP password **Required**|
 | `MAILER_SENDER` | From address for mails sent by the app **Required**|
@@ -66,5 +66,3 @@ then put the certificate and the encrypted key into `conf/credentials` folder. Y
 | `S3_REGIO` | S3 regio *Optional*|
 | `S3_BUCKET` | S3 bucket *Optional*|
 | `REMOTE_LOGSERVER_AND_PORT` | Remote syslog `@@host:port` for TCP, `@host:port` for UDP *Optional*|
-
-
