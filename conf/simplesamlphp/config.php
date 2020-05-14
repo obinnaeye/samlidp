@@ -55,7 +55,7 @@ $config = array(
     'errorreporting' => true,
 
     /*
-     * Custom error show function called from SimpleSAML_Error_Error::show.
+     * Custom error show function called from \SimpleSAML\Error\Error::show.
      * See docs/simplesamlphp-errorhandling.txt for function code example.
      *
      * Example:
