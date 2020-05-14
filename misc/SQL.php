@@ -8,7 +8,7 @@ use Doctrine\Common\Annotations\AnnotationRegistry;
  * This class is an example authentication source which authenticates an user
  * against a SQL database.
  */
-class sspmod_sqlauth_Auth_Source_SQL extends sspmod_core_Auth_UserPassBase
+class sspmod_sqlauth_Auth_Source_SQL extends SimpleSAML\Module\core\Auth\UserPassBase
 {
     /**
      * The DSN we should connect to.
@@ -106,7 +106,7 @@ class sspmod_sqlauth_Auth_Source_SQL extends sspmod_core_Auth_UserPassBase
      *
      * On a successful login, this function should return the users attributes. On failure,
      * it should throw an exception. If the error was caused by the user entering the wrong
-     * username or password, a SimpleSAML_Error_Error('WRONGUSERPASS') should be thrown.
+     * username or password, a \SimpleSAML\Error\Error('WRONGUSERPASS') should be thrown.
      *
      * Note that both the username and the password are UTF-8 encoded.
      *
@@ -125,7 +125,7 @@ class sspmod_sqlauth_Auth_Source_SQL extends sspmod_core_Auth_UserPassBase
         $kernel->boot();
         $container = $kernel->getContainer();
         $sspgetter = $container->get('appbundle.sspgetter');
-
+        
         $salt = $sspgetter->getUserSalt($username);
         $digested = openssl_digest($raw . $salt, 'sha512', TRUE);
         $password = base64_encode($digested . $salt);
@@ -160,7 +160,7 @@ class sspmod_sqlauth_Auth_Source_SQL extends sspmod_core_Auth_UserPassBase
             /* No rows returned - invalid username/password. */
             SimpleSAML\Logger::error('sqlauth:'.$this->authId.
                 ': No rows in result set. Probably wrong username/password.');
-            throw new SimpleSAML_Error_Error('WRONGUSERPASS');
+            throw new \SimpleSAML\Error\Error('WRONGUSERPASS');
         }
 
         // Ide jön a belépés loggolás
