@@ -208,6 +208,9 @@ class SSPGetter
             );
         }
         # for production use here could come some error handling
+        if (!$idpUser) {
+            return;
+        }
         return $idpUser->getSalt();
     }
 
